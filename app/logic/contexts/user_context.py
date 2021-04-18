@@ -1,6 +1,8 @@
-from database.models.database_init import db
-from database.models.main_models import User
-from logic.encryption.password import verify_password, create_bcrypt_hash
+from typing import Optional
+
+from app.database.models.database_init import db
+from app.database.models.main_models import User
+from app.logic.encryption.password import verify_password, create_bcrypt_hash
 
 
 class UserContext:
@@ -44,14 +46,22 @@ class UserContext:
         return UserContext(user) if user else False
 
     @staticmethod
+    def get_user_by_email(email: str) -> Optional[User]:
+        user = db.session.query(User).filter(User.userEmail == email).first()
+        return user if user else None
+
+    @staticmethod
+    def get_user_by_name_or_email(name: str, email: str) -> Optional[User]:
+        user = db.session.query(User).filter(User.userName == name or User.userEmail == email).first()
+        return user if user else None
+
+    @staticmethod
     def log_user_in(username: str, password: str) -> bool:
         if UserContext.get_user_instance_by_username(username).log_in(password):
             return True
         return False
 
     @staticmethod
-    def add_new_user(username: str, password: str):
-        if not UserContext.get_user_instance_by_username(username):
-            user_instance = UserContext()
-            user_instance.set_user_name(username)
-            user_instance.set_password(password)
+    def add_new_user(user: User):
+        db.session.add(user)
+        db.session.commit()

@@ -1,6 +1,6 @@
 import datetime
 
-from database.models.database_init import db
+from app.database.models.database_init import db
 
 
 class BaseModel(db.Model):

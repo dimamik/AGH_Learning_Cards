@@ -1,8 +1,8 @@
 import logging
 
-from database.models.database_init import db
-from database.models.main_models import CardsCollection, Card
-from logic.json_formatter.to_json import JsonEncoder
+from app.database.models import db
+from app.database.models import CardsCollection, Card
+from app.logic.json_formatter.to_json import JsonEncoder
 
 
 class CardsCollectionContext:
