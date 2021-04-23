@@ -20,7 +20,7 @@ def hello_world():
     # u_inst.set_user_info('New Description')
     # print(u_inst.change_password('password', 'new_password'))
 
-    print(u_inst.user.cards)
+    # print(u_inst.user.cards)
     return 'Hello World!'
 
 

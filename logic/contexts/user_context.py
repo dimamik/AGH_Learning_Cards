@@ -1,46 +1,49 @@
-from database.models.database_init import db
 from database.models.main_models import User
+from database.session import Session
 from logic.encryption.password import verify_password, create_bcrypt_hash
 
 
 class UserContext:
+    """
+    Class wrapping User Instance
+    """
+
     def __init__(self, user=None):
         super(UserContext, self).__init__()
         if user is None:
             user = User()
-            db.session.add(user)
-            db.session.commit()
+            Session.add_and_commit(user)
         self.user = user
 
-    def set_user_name(self, username):
+    def set_user_name(self, username: str):
         self.user.userName = username
-        db.session.commit()
+        Session.commit()
 
     def set_user_info(self, info: str):
         self.user.userInfo = info
-        db.session.commit()
+        Session.commit()
 
     def log_in(self, password):
         return verify_password(password, self.user.userPasswordHash)
 
-    def change_password(self, old_password, new_password):
+    def change_password(self, old_password: str, new_password: str) -> bool:
         if self.log_in(old_password):
             self.set_password(new_password)
             return True
         return False
 
-    def set_password(self, new_password):
+    def set_password(self, new_password: str):
         self.user.userPasswordHash = create_bcrypt_hash(new_password)
-        db.session.commit()
+        Session.commit()
 
     @staticmethod
     def get_user_instance_by_id(uid: int):
-        user = db.session.query(User).filter(User.userID == uid).first()
+        user = Session.query(User).filter(User.userID == uid).first()
         return UserContext(user)
 
     @staticmethod
-    def get_user_instance_by_username(username):
-        user = db.session.query(User).filter(User.userName == username).first()
+    def get_user_instance_by_username(username: str):
+        user = Session.query(User).filter(User.userName == username).first()
         return UserContext(user) if user else False
 
     @staticmethod
@@ -51,7 +54,9 @@ class UserContext:
 
     @staticmethod
     def add_new_user(username: str, password: str):
+        user_instance = None
         if not UserContext.get_user_instance_by_username(username):
             user_instance = UserContext()
             user_instance.set_user_name(username)
             user_instance.set_password(password)
+        return user_instance

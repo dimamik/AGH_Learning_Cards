@@ -1,57 +1,61 @@
 import logging
 
-from database.models.database_init import db
 from database.models.main_models import CardsCollection, Card
-from logic.json_formatter.to_json import JsonEncoder
+from database.session import Session
+from logic.contexts.card_inside import CardInside
 
 
 class CardsCollectionContext:
-    def __init__(self, cards_parent=None, holder_instance=None):
-        if cards_parent is None:
+    def __init__(self, collection=None, holder_instance=None):
+        if collection is None:
             if holder_instance is not None:
-                cards_parent = CardsCollection()
-                cards_parent.user = holder_instance
-                db.session.add(cards_parent)
-                db.session.commit()
+                collection = CardsCollection()
+                collection.user = holder_instance
+                Session.add_and_commit(collection)
             else:
                 logging.error("Can't create object without a ref")
-        self.cards = cards_parent
+        self.collection = collection
+
+    def __repr__(self):
+        return self.collection.__repr__()
 
     def set_description(self, description: str):
-        self.cards.collectionDescription = description
-        db.session.commit()
+        self.collection.collectionDescription = description
+        Session.commit()
 
     @staticmethod
     def get_collection_by_id(collection_id: int):
-        collection = db.session.query(CardsCollection) \
-            .filter(CardsCollection.cardID == collection_id) \
+        collection = Session.query(CardsCollection) \
+            .filter(CardsCollection.collectionID == collection_id) \
             .first()
         return CardsCollectionContext(collection) \
             if collection is not None else False
 
     def add_single_card_to_collection(self, single_card=Card(), card_inside=None) -> bool:
-        if single_card not in self.cards.singleCards:
-            single_card.cardsCollection = self.cards
+        if single_card not in self.collection.singleCards:
+            single_card.cardsCollection = self.collection
             if card_inside is not None:
                 single_card.cardInside = card_inside
-            db.session.add(single_card)
-            db.session.commit()
+            Session.add_and_commit(single_card)
             return True
         return False
 
     def get_single_cards_list(self):
-        return self.cards.singleCards
+        return self.collection.cards
+
+    def get_all_cards_json(self):
+        return self.collection.cards
 
     @staticmethod
     def get_single_card_by_id(card_id: int):
-        card = db.session.query(Card) \
+        card = Session.query(Card) \
             .filter(Card.cardID == card_id) \
             .first()
         return card \
             if card is not None else False
 
     @staticmethod
-    def insert_inside_json_into_single_card(card: Card, dict_to_insert: dict):
-        card.cardInside = JsonEncoder.dict_to_json(dict_to_insert)
-        db.session.add(card)
-        db.session.commit()
+    def insert_inside_json_into_single_card(card: Card, card_inside: CardInside):
+        card.cardInside = card_inside.json()
+        Session.add_and_commit(card)
+        return card_inside is not None
