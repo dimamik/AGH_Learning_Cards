@@ -1,6 +1,6 @@
 import datetime
 
-from app.database.models.database_init import db
+from app.database import db
 
 
 class BaseModel(db.Model):
@@ -12,16 +12,18 @@ class BaseModel(db.Model):
 
     def _to_dict(self):
         to_ret = self.__dict__.copy()
-        to_ret.pop('_sa_instance_state')
+        if '_sa_instance_state' in to_ret:
+            to_ret.pop('_sa_instance_state')
         return to_ret.items()
 
     # TODO Work on _to_dict form of representation!
     def __repr__(self):
-        """Define a base way to print models"""
-        return '%s(%s)' % (self.__class__.__name__, {
-            column: value
-            for column, value in self._to_dict()
-        })
+        # """Define a base way to print models"""
+        # return '%s(%s)' % (self.__class__.__name__, {
+        #     column: value
+        #     for column, value in self._to_dict()
+        # })
+        return str(self.json())
 
     def json(self):
         """

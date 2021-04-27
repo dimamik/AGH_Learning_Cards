@@ -1,67 +1,71 @@
-from typing import Optional
-
-from app.database.models.database_init import db
 from app.database.models.main_models import User
-from app.logic.encryption.password import verify_password, create_bcrypt_hash
+from app.database import Session
 
 
 class UserContext:
-    def __init__(self, user=None):
+    """
+    Class wrapping User Instance
+    """
+
+    def __init__(self, user: User):
         super(UserContext, self).__init__()
-        if user is None:
-            user = User()
-            db.session.add(user)
-            db.session.commit()
         self.user = user
 
-    def set_user_name(self, username):
+    def set_username(self, username: str):
         self.user.userName = username
-        db.session.commit()
+        Session.commit()
 
     def set_user_info(self, info: str):
         self.user.userInfo = info
-        db.session.commit()
+        Session.commit()
 
-    def log_in(self, password):
-        return verify_password(password, self.user.userPasswordHash)
+    def set_password_hash(self, new_password_hash: str):
+        self.user.userPasswordHash = new_password_hash
+        Session.commit()
 
-    def change_password(self, old_password, new_password):
-        if self.log_in(old_password):
-            self.set_password(new_password)
-            return True
+    def is_authenticated(self) -> bool:
         return False
 
-    def set_password(self, new_password):
-        self.user.userPasswordHash = create_bcrypt_hash(new_password)
-        db.session.commit()
+    def is_active(self) -> bool:
+        return True
+
+    def is_anonymous(self) -> bool:
+        return False
+
+    def get_id(self) -> str:
+        return self.user.userEmail
+
+    @staticmethod
+    def exists_by_username(user_name: str) -> bool:
+        return Session.query(User).filter(User.userName == user_name).first() is not None
+
+    @staticmethod
+    def exists_by_email(email: str) -> bool:
+        return Session.query(User).filter(User.userEmail == email).first() is not None
 
     @staticmethod
     def get_user_instance_by_id(uid: int):
-        user = db.session.query(User).filter(User.userID == uid).first()
-        return UserContext(user)
+        user = Session.query(User).filter(User.userID == uid).first()
+        return UserContext(user) if user else None
 
     @staticmethod
-    def get_user_instance_by_username(username):
-        user = db.session.query(User).filter(User.userName == username).first()
-        return UserContext(user) if user else False
+    def get_user_instance_by_username(username: str):
+        user = Session.query(User).filter(User.userName == username).first()
+        return UserContext(user) if user else None
 
     @staticmethod
-    def get_user_by_email(email: str) -> Optional[User]:
-        user = db.session.query(User).filter(User.userEmail == email).first()
-        return user if user else None
+    def get_user_instance_by_email(email: str):
+        user = Session.query(User).filter(User.userEmail == email).first()
+        return UserContext(user) if user else None
 
     @staticmethod
-    def get_user_by_name_or_email(name: str, email: str) -> Optional[User]:
-        user = db.session.query(User).filter(User.userName == name or User.userEmail == email).first()
-        return user if user else None
+    def add_new_user(username: str, email: str, password_hash: str):
+        user = User()
+        user.userName = username
+        user.userEmail = email
+        user.userPasswordHash = password_hash
 
-    @staticmethod
-    def log_user_in(username: str, password: str) -> bool:
-        if UserContext.get_user_instance_by_username(username).log_in(password):
-            return True
-        return False
+        Session.add_and_commit(user)
+        user_context = UserContext(user)
 
-    @staticmethod
-    def add_new_user(user: User):
-        db.session.add(user)
-        db.session.commit()
+        return user_context
