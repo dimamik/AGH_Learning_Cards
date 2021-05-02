@@ -2,7 +2,6 @@ from flask import Flask
 
 from database.models.database_init import regenerate_database_with_app
 from env import POSTGRES
-from logic.contexts.card_context import CardContext
 from logic.contexts.cards_collection_context import CardsCollectionContext
 from logic.contexts.user_context import UserContext
 
@@ -19,13 +18,18 @@ def init_app():
 
 
 def test():
-    # usr_context = UserContext.add_new_user('username1', 'password')
-    usr_context = UserContext.get_user_instance_by_username('username')
+    # usr_context = UserContext.add_new_user('username1', 'some_email@email.com', 'password')
+    usr_context = UserContext.get_user_instance_by_username('username1')
     # print(usr_context.user.json())
-    cards_coll_context = CardsCollectionContext.get_collection_by_id(2)
-    cards = cards_coll_context.get_all_cards_json()
-    print(cards)
+    cards_coll_context = CardsCollectionContext(holder_instance=usr_context.user)
+    cards_coll_context.add_collection_to_liked(usr_context)
 
+    print(cards_coll_context.get_user_liked_collections(usr_context.user.userID))
+    # cards = cards_coll_context.get_all_cards_json()
+    # print(cards)
+    # single_card = CardsCollectionContext.get_single_card_by_id(1)
+    # CardContext(cards_coll_context.collection, single_card).add_card_to_watched(usr_context.user)
+    # print(CardsCollectionContext.get_user_collections(1))
     # cardCollInstance = CardsCollectionContext(usr.user)
     # cardCollInstance = CardsCollectionContext.get_collection_by_id(6)
     # cardCollInstance.add_single_card_to_collection()

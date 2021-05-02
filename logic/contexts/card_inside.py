@@ -16,7 +16,7 @@ class CardInside:
         :return: Json string representing card inner body
         (foreground and background parts and contexts)
         """
-        return ""
+        return self.json()
 
     def _to_dict(self):
         to_ret = self.__dict__.copy()

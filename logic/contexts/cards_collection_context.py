@@ -1,8 +1,9 @@
 import logging
+from typing import Optional
 
-from database.models.main_models import CardsCollection, Card
+from database.models.main_models import CardsCollection, Card, CardWatched, UserLikedCollection
 from database.session import Session
-from logic.contexts.card_inside import CardInside
+from logic.contexts.user_context import UserContext
 
 
 class CardsCollectionContext:
@@ -47,7 +48,16 @@ class CardsCollectionContext:
         return self.collection.cards
 
     @staticmethod
-    def get_single_card_by_id(card_id: int):
+    def get_user_collections(user_id: int):
+        return Session.query(CardsCollection).filter(CardsCollection.holderID == user_id).all()
+
+    def get_collection_watched_only(self, user_id):
+        return Session.query(Card).join(CardWatched) \
+            .filter(Card.collectionID == self.collection.collectionID,
+                    CardWatched.userID == user_id).all()
+
+    @staticmethod
+    def get_single_card_by_id(card_id: int) -> Optional[Card]:
         card = Session.query(Card) \
             .filter(Card.cardID == card_id) \
             .first()
@@ -55,7 +65,12 @@ class CardsCollectionContext:
             if card is not None else False
 
     @staticmethod
-    def insert_inside_json_into_single_card(card: Card, card_inside: CardInside):
-        card.cardInside = card_inside.json()
-        Session.add_and_commit(card)
-        return card_inside is not None
+    def get_user_liked_collections(user_id: int):
+        user = UserContext.get_user_instance_by_id(user_id).user
+        return user.collectionsLiked
+
+    def add_collection_to_liked(self, user_context):
+        user_liked_collection = UserLikedCollection()
+        user_liked_collection.collectionID = self.collection.collectionID
+        user_liked_collection.userID = user_context.user.userID
+        Session.add_and_commit(user_liked_collection)
