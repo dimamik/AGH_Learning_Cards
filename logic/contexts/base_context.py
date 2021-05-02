@@ -1,6 +1,16 @@
 class BaseContext:
-    """
-    Class that connects all contexts
-    Returns json and string representation of objects
-    """
-    pass
+    def __init__(self):
+        self.instance = None
+
+    def __repr__(self):
+
+        if self.instance is not None:
+            return self.instance.__repr__()
+        else:
+            return ""
+
+    def json(self):
+        if self.instance is not None:
+            self.instance.json()
+        else:
+            return None

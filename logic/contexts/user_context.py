@@ -1,26 +1,27 @@
 from database.models.main_models import User
 from database.session import Session
+from logic.contexts.base_context import BaseContext
 
 
-class UserContext:
+class UserContext(BaseContext):
     """
     Class wrapping User Instance
     """
 
     def __init__(self, user: User):
         super(UserContext, self).__init__()
-        self.user = user
+        self.instance = user
 
     def set_username(self, username: str):
-        self.user.userName = username
+        self.instance.userName = username
         Session.commit()
 
     def set_user_info(self, info: str):
-        self.user.userInfo = info
+        self.instance.userInfo = info
         Session.commit()
 
     def set_password_hash(self, new_password_hash: str):
-        self.user.userPasswordHash = new_password_hash
+        self.instance.userPasswordHash = new_password_hash
         Session.commit()
 
     def is_authenticated(self) -> bool:
@@ -33,7 +34,7 @@ class UserContext:
         return False
 
     def get_id(self) -> str:
-        return self.user.userEmail
+        return self.instance.userEmail
 
     @staticmethod
     def exists_by_username(user_name: str) -> bool:
