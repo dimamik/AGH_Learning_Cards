@@ -8,7 +8,6 @@ from app.http.errors import BadRequestException, ConflictException, NotFoundExce
 from app.http.transfer_objects import UserCreationRequest, UserResponse, UserLoginRequest
 from app.logic.contexts.user_context import UserContext
 
-
 argon2 = Argon2()
 login_manager = LoginManager()
 

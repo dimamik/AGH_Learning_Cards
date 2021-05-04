@@ -1,4 +1,4 @@
-from database.models.database_init import db
+from app.database import db
 
 
 class Session:

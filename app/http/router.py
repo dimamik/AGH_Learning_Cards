@@ -8,7 +8,6 @@ from app.http.http_statuses import HTTP_CREATED, HTTP_OK, HTTP_NO_CONTENT
 from app.http.transfer_objects import UserCreationRequest, UserLoginRequest
 from app.logic.services import auth_service
 
-
 router = Blueprint('router', __name__)
 
 cors = CORS()

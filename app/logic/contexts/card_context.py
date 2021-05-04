@@ -1,7 +1,7 @@
-from database.models.main_models import Card, User, CardWatched
-from database.session import Session
-from logic.contexts.base_context import BaseContext
-from logic.contexts.card_inside import CardInside
+from app.database.models.main_models import Card, User, CardWatched
+from app.database.session import Session
+from app.logic.contexts.base_context import BaseContext
+from app.logic.contexts.card_inside import CardInside
 
 
 class CardContext(BaseContext):

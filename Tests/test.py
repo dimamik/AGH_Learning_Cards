@@ -1,9 +1,9 @@
 from flask import Flask
 
-from database.models.database_init import regenerate_database_with_app
-from env import POSTGRES
-from logic.contexts.cards_collection_context import CardsCollectionContext
-from logic.contexts.user_context import UserContext
+from app.database import regenerate_database_with_app
+from app.logic.contexts.cards_collection_context import CardsCollectionContext
+from app.logic.contexts.user_context import UserContext
+from config import POSTGRES
 
 app = Flask(__name__)
 app.config['DEBUG'] = True

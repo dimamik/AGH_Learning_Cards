@@ -2,7 +2,7 @@ from flask import Flask
 
 from app.database.models.main_models import User
 from app.logic.contexts.user_context import UserContext
-from app.config import POSTGRES, SECRET_KEY
+from config import POSTGRES, SECRET_KEY
 
 
 def create_app():

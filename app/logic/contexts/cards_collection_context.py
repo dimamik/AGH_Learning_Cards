@@ -1,12 +1,16 @@
 import logging
+from typing import Union
 
-from app.database import Session
-from app.database.models.main_models import CardsCollection, Card
-from app.logic.contexts.card_inside import CardInside
+from app import UserContext
+from app.database.models.main_models import CardsCollection, Card, CardWatched, UserLikedCollection
+from app.database.session import Session
+from app.logic.contexts.base_context import BaseContext
+from app.logic.contexts.card_context import CardContext
 
 
-class CardsCollectionContext:
+class CardsCollectionContext(BaseContext):
     def __init__(self, collection=None, holder_instance=None):
+        super(CardsCollectionContext, self).__init__()
         if collection is None:
             if holder_instance is not None:
                 collection = CardsCollection()
@@ -14,13 +18,10 @@ class CardsCollectionContext:
                 Session.add_and_commit(collection)
             else:
                 logging.error("Can't create object without a ref")
-        self.collection = collection
-
-    def __repr__(self):
-        return self.collection.__repr__()
+        self.instance = collection
 
     def set_description(self, description: str):
-        self.collection.collectionDescription = description
+        self.instance.collectionDescription = description
         Session.commit()
 
     @staticmethod
@@ -32,8 +33,8 @@ class CardsCollectionContext:
             if collection is not None else False
 
     def add_single_card_to_collection(self, single_card=Card(), card_inside=None) -> bool:
-        if single_card not in self.collection.singleCards:
-            single_card.cardsCollection = self.collection
+        if single_card not in self.instance.cards:
+            single_card.cardsCollection = self.instance
             if card_inside is not None:
                 single_card.cardInside = card_inside
             Session.add_and_commit(single_card)
@@ -41,21 +42,35 @@ class CardsCollectionContext:
         return False
 
     def get_single_cards_list(self):
-        return self.collection.cards
+        return self.instance.cards
 
     def get_all_cards_json(self):
-        return self.collection.cards
+        return self.instance.cards
 
     @staticmethod
-    def get_single_card_by_id(card_id: int):
+    def get_user_collections(user_id: int):
+        return Session.query(CardsCollection).filter(CardsCollection.holderID == user_id).all()
+
+    def get_collection_watched_only(self, user_id):
+        return Session.query(Card).join(CardWatched) \
+            .filter(Card.collectionID == self.instance.collectionID,
+                    CardWatched.userID == user_id).all()
+
+    @staticmethod
+    def get_single_card_by_id(card_id: int) -> Union[CardContext, bool]:
         card = Session.query(Card) \
             .filter(Card.cardID == card_id) \
             .first()
-        return card \
+        return CardContext(card.collectionID, card) \
             if card is not None else False
 
     @staticmethod
-    def insert_inside_json_into_single_card(card: Card, card_inside: CardInside):
-        card.cardInside = card_inside.json()
-        Session.add_and_commit(card)
-        return card_inside is not None
+    def get_user_liked_collections(user_id: int):
+        user = UserContext.get_user_instance_by_id(user_id).instance
+        return user.collectionsLiked
+
+    def add_collection_to_liked(self, user_context):
+        user_liked_collection = UserLikedCollection()
+        user_liked_collection.collectionID = self.instance.collectionID
+        user_liked_collection.userID = user_context.instance.userID
+        Session.add_and_commit(user_liked_collection)
