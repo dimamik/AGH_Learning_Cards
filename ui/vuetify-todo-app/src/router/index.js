@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import CollectionsListComponent from "@/components/CollectionsListComponent";
 import LearnCollection from "@/views/LearnCollection";
 import Profile from "@/views/Profile";
+import AuthComponent from "../components/auth/AuthComponent";
 
 Vue.use(VueRouter)
 
@@ -16,20 +17,23 @@ const routes = [
     },
     {
         path: '/my-cards',
-        alias: ['/my-cards'],
         name: 'my-cards',
         component: CollectionsListComponent
     },
     {
         path: '/profile',
-        alias: ['/profile'],
         name: 'profile',
         component: Profile
     },
     {
         path: '/learn-collection',
-        name: 'profile',
+        name: 'learn-collection',
         component: LearnCollection
+    },
+    {
+        path: '/auth',
+        name: 'auth',
+        component: AuthComponent
     }
 ]
 
