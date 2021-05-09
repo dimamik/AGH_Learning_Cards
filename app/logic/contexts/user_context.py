@@ -24,12 +24,15 @@ class UserContext(BaseContext):
         self.instance.userPasswordHash = new_password_hash
         Session.commit()
 
+    @property
     def is_authenticated(self) -> bool:
-        return False
+        return True
 
+    @property
     def is_active(self) -> bool:
         return True
 
+    @property
     def is_anonymous(self) -> bool:
         return False
 

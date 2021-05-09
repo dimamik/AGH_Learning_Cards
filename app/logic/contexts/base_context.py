@@ -11,6 +11,6 @@ class BaseContext:
 
     def json(self):
         if self.instance is not None:
-            self.instance.json()
+            return self.instance.json()
         else:
             return None

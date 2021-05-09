@@ -31,7 +31,7 @@ def create_user(user_request: UserCreationRequest) -> UserResponse:
         argon2.generate_password_hash(user_request.user_password)
     )
 
-    flask_login.login_user(user_context)
+    flask_login.login_user(user_context, remember=True)
 
     return UserResponse(user_context)
 
@@ -44,10 +44,10 @@ def login_user(user_request: UserLoginRequest) -> UserResponse:
 
     if user_context is None:
         raise NotFoundException("User with given email does not exist")
-    elif not argon2.check_password_hash(user_context.user.userPasswordHash, user_request.user_password):
+    elif not argon2.check_password_hash(user_context.instance.userPasswordHash, user_request.user_password):
         raise UnauthorizedException("Password is wrong")
 
-    flask_login.login_user(user_context)
+    flask_login.login_user(user_context, remember=True)
 
     return UserResponse(user_context)
 

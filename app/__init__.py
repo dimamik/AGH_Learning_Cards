@@ -11,6 +11,7 @@ def create_app():
     app.config['DEBUG'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{POSTGRES["user"]}:{POSTGRES["pw"]}@{POSTGRES["host"]}: \
             {POSTGRES["port"]}/{POSTGRES["db"]}'
+    app.config['CORS_HEADERS'] = 'Content-Type'
     app.secret_key = SECRET_KEY
 
     from app.database import db, migrate

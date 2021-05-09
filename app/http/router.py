@@ -1,10 +1,10 @@
 import flask
 from flask import Blueprint
 from flask_cors import CORS, cross_origin
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from app.http.errors import HttpException
-from app.http.http_statuses import HTTP_CREATED, HTTP_OK, HTTP_NO_CONTENT
+from app.http.http_statuses import HTTP_CREATED, HTTP_OK, HTTP_NO_CONTENT, HTTP_NOT_FOUND
 from app.http.transfer_objects import UserCreationRequest, UserLoginRequest
 from app.logic.services import auth_service
 
@@ -54,3 +54,14 @@ def handle_test():
         return flask.jsonify(message='Test message protected by login_required'), HTTP_OK
     except HttpException as e:
         return flask.jsonify(message=f'{e}'), e.status
+
+
+@router.route('/auth/current-user', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def handle_current():
+    if current_user.is_anonymous:
+        return flask.jsonify(''), HTTP_NO_CONTENT
+    else:
+        resp: dict = current_user.json()
+        resp.pop('userPasswordHash')
+        return flask.jsonify(resp), HTTP_OK
