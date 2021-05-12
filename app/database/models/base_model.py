@@ -14,20 +14,10 @@ class BaseModel(db.Model):
         to_ret = self.__dict__.copy()
         if '_sa_instance_state' in to_ret:
             to_ret.pop('_sa_instance_state')
-        # for index,item in enumerate(to_ret.items()):
-        #     if type(item) is dict:
-        #         to_ret[index] = str(item.__dict__.copy())
-        #
-        # print("I am dict and returning: ", to_ret.items())
         return to_ret.items()
 
     # TODO Work on _to_dict form of representation!
     def __repr__(self):
-        # """Define a base way to print models"""
-        # return '%s(%s)' % (self.__class__.__name__, {
-        #     column: value
-        #     for column, value in self._to_dict()
-        # })
         return str(self.json())
 
     def json(self):

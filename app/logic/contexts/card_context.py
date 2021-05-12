@@ -28,3 +28,9 @@ class CardContext(BaseContext):
             card_watched.cardID = self.instance.cardID
             card_watched.userID = user.userID
             Session.add_and_commit(card_watched)
+
+    @staticmethod
+    def get_card_by_id(card_id):
+        return Session.query(Card).filter(
+            Card.cardID == card_id
+        ).first()

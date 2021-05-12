@@ -8,6 +8,11 @@ class Session:
         db.session.commit()
 
     @staticmethod
+    def del_and_commit(obj_to_del: db.Model):
+        db.session.delete(obj_to_del)
+        db.session.commit()
+
+    @staticmethod
     def commit():
         db.session.commit()
 
