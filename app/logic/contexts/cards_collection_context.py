@@ -29,8 +29,14 @@ class CardsCollectionContext(BaseContext):
         collection = Session.query(CardsCollection) \
             .filter(CardsCollection.collectionID == collection_id) \
             .first()
-        return CardsCollectionContext(collection) \
-            if collection is not None else False
+        return collection
+
+    @staticmethod
+    def get_collection_by_id_json(collection_id):
+        collection = Session.query(CardsCollection) \
+            .filter(CardsCollection.collectionID == collection_id) \
+            .first()
+        return collection.json() or None
 
     def add_single_card_to_collection(self, single_card=Card(), card_inside=None) -> bool:
         if single_card not in self.instance.cards:
@@ -41,20 +47,23 @@ class CardsCollectionContext(BaseContext):
             return True
         return False
 
-    def get_single_cards_list(self):
-        return self.instance.cards
-
-    def get_all_cards_json(self):
-        return self.instance.cards
+    @staticmethod
+    def get_user_collections_json(user_id: int):
+        to_ret_plain = Session.query(CardsCollection).filter(CardsCollection.holderID == user_id).all()
+        if to_ret_plain is not None:
+            for index, obj in enumerate(to_ret_plain):
+                to_ret_plain[index] = obj.json()
+        return to_ret_plain
 
     @staticmethod
-    def get_user_collections(user_id: int):
-        return Session.query(CardsCollection).filter(CardsCollection.holderID == user_id).all()
-
-    def get_collection_watched_only(self, user_id):
-        return Session.query(Card).join(CardWatched) \
+    def get_collection_watched_only_json(user_id):
+        collection = Session.query(Card).join(CardWatched) \
             .filter(Card.collectionID == self.instance.collectionID,
                     CardWatched.userID == user_id).all()
+        for index,obj in collection:
+            collection[index] = obj.json()
+        return collection
+
 
     @staticmethod
     def get_single_card_by_id(card_id: int) -> Union[CardContext, bool]:
@@ -74,3 +83,35 @@ class CardsCollectionContext(BaseContext):
         user_liked_collection.collectionID = self.instance.collectionID
         user_liked_collection.userID = user_context.instance.userID
         Session.add_and_commit(user_liked_collection)
+
+    # TODO Place it somewhere else :)
+    @staticmethod
+    def get_all_collections_json():
+        to_ret_plain = Session.query(CardsCollection).all()
+        for index, obj in enumerate(to_ret_plain):
+            to_ret_plain[index] = obj.json()
+        return to_ret_plain
+
+    @staticmethod
+    def get_single_cards_string_list(collection_id):
+        cards = CardsCollectionContext.get_collection_by_id(collection_id)
+        to_ret = None
+        if cards is not None:
+            to_ret = cards.cards
+        return to_ret
+
+    @staticmethod
+    def add_new_collection(holder_id):
+        holder = UserContext.get_user_instance_by_id(holder_id)
+        print(holder)
+        if holder is not None:
+            cards_coll_context = CardsCollectionContext(holder_instance=holder.instance)
+            print(cards_coll_context)
+            return cards_coll_context.instance.collectionID
+        else:
+            return False
+
+    @staticmethod
+    def delete_collection(collection_id):
+        # TODO
+        return True

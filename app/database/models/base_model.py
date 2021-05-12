@@ -10,10 +10,15 @@ class BaseModel(db.Model):
     def __init__(self, *args):
         super().__init__(*args)
 
-    def _to_dict(self):
+    def to_dict(self):
         to_ret = self.__dict__.copy()
         if '_sa_instance_state' in to_ret:
             to_ret.pop('_sa_instance_state')
+        # for index,item in enumerate(to_ret.items()):
+        #     if type(item) is dict:
+        #         to_ret[index] = str(item.__dict__.copy())
+        #
+        # print("I am dict and returning: ", to_ret.items())
         return to_ret.items()
 
     # TODO Work on _to_dict form of representation!
@@ -31,7 +36,7 @@ class BaseModel(db.Model):
         """
         return {
             column: value if not isinstance(value, datetime.date) else value.strftime('%Y-%m-%d')
-            for column, value in self._to_dict()
+            for column, value in self.to_dict()
         }
 
     def save(self, commit=True):

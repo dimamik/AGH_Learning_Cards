@@ -1,5 +1,10 @@
-class BaseContext:
+from json import JSONEncoder
+from typing import Any
+
+
+class BaseContext(JSONEncoder):
     def __init__(self):
+        super(BaseContext, self).__init__()
         self.instance = None
 
     def __repr__(self):
