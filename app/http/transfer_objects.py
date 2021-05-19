@@ -25,8 +25,10 @@ class UserLoginRequest:
 class UserResponse:
     def __init__(self, user_context: UserContext):
         self.user_name = user_context.instance.userName
+        self.user_id = user_context.instance.userID
 
     def to_dict(self):
         return {
-            'username': self.user_name
+            'username': self.user_name,
+            'userID': self.user_id
         }

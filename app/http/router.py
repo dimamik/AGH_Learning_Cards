@@ -88,9 +88,9 @@ def all_collections_by_user(user_id):
 @cross_origin(supports_credentials=True)
 def get_cards_in_collection(collection_id):
     user_id = current_user.instance.userID
-    print(user_id)
-    to_ret = flask.jsonify(str(
-        CardsCollectionContext.get_cards_in_collection_with_respect_to_watched(collection_id, user_id)))
+    to_ret = flask.jsonify(
+        CardsCollectionContext.get_cards_in_collection_with_respect_to_watched(collection_id, user_id))
+
     if to_ret is not None:
         return to_ret, HTTP_OK
 
