@@ -8,14 +8,15 @@ class CardsCollection(BaseModel, db.Model):
     collectionName = db.Column(db.String)
     collectionDescription = db.Column(db.JSON)
     holderID = db.Column(db.Integer, db.ForeignKey('User.userID'), nullable=False)
-    cardInfo = db.relationship('UserCollectionInfo', backref='cardsCollection', lazy=True)
-    cards = db.relationship('Card', backref='cardsCollection', lazy=True)
+    cardInfo = db.relationship('UserCollectionInfo', backref='cardsCollection', lazy=True, cascade="all, delete")
+    cards = db.relationship('Card', backref='cardsCollection', lazy=True, cascade="all,delete")
 
 
 class Card(BaseModel):
     __tablename__ = 'Card'
     cardID = db.Column(db.Integer, primary_key=True)
-    collectionID = db.Column(db.Integer, db.ForeignKey('CardsCollection.collectionID'), nullable=False)
+    collectionID = db.Column(db.Integer, db.ForeignKey('CardsCollection.collectionID')
+                             )
     cardInside = db.Column(db.JSON)
 
 
@@ -26,9 +27,9 @@ class User(BaseModel):
     userEmail = db.Column(db.String, nullable=False, unique=True)
     userPasswordHash = db.Column(db.String)
     userInfo = db.Column(db.JSON)
-    cards = db.relationship('CardsCollection', backref='user', lazy=True)
-    cardsWatched = db.relationship('CardWatched', backref='user', lazy=True)
-    collectionsLiked = db.relationship('UserLikedCollection', backref='user', lazy=True)
+    cards = db.relationship('CardsCollection', backref='user', lazy=True, cascade="all,delete")
+    cardsWatched = db.relationship('CardWatched', backref='user', lazy=True, cascade="all,delete")
+    collectionsLiked = db.relationship('UserLikedCollection', backref='user', lazy=True, cascade="all,delete")
 
 
 class UserCollectionInfo(BaseModel, db.Model):

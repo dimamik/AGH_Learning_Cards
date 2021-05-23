@@ -92,6 +92,23 @@ class CardsCollectionContext(BaseContext):
         to_ret_plain = Session.query(CardsCollection).all()
         for index, obj in enumerate(to_ret_plain):
             to_ret_plain[index] = obj.json()
+            to_ret_plain[index] = obj.json()
+        return to_ret_plain
+
+    @staticmethod
+    def get_all_collections_with_field_liked(user_id):
+        to_ret_plain = Session.query(CardsCollection).all()
+        list_of_liked = []
+        liked = CardsCollectionContext.get_user_liked_collections(user_id)
+        for collection in liked:
+            print(collection)
+            list_of_liked.append(collection.collectionID)
+        for index, obj in enumerate(to_ret_plain):
+            to_ret_plain[index] = obj.json()
+            if obj.collectionID in list_of_liked:
+                to_ret_plain[index]['is_liked'] = True
+            else:
+                to_ret_plain[index]['is_liked'] = False
         return to_ret_plain
 
     @staticmethod

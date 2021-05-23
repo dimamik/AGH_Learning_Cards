@@ -72,7 +72,11 @@ def handle_current():
 @router.route('/collections', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def all_collections():
-    return flask.jsonify(CardsCollectionContext.get_all_collections_json()), HTTP_OK
+    if current_user.is_anonymous:
+        return flask.jsonify(CardsCollectionContext.get_all_collections_json()), HTTP_OK
+    else:
+        return flask.jsonify(
+            CardsCollectionContext.get_all_collections_with_field_liked(current_user.instance.userID)), HTTP_OK
 
 
 @router.route('/collections/user/<user_id>', methods=['GET'])
