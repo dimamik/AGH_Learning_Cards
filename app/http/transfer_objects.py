@@ -29,6 +29,6 @@ class UserResponse:
 
     def to_dict(self):
         return {
-            'username': self.user_name,
+            'userName': self.user_name,
             'userID': self.user_id
         }
