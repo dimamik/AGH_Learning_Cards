@@ -86,7 +86,6 @@ class CardsCollectionContext(BaseContext):
         user = UserContext.get_user_instance_by_id(user_id).instance
         return user.collectionsLiked
 
-    # TODO Place it somewhere else :)
     @staticmethod
     def get_all_collections_json():
         to_ret_plain = Session.query(CardsCollection).all()

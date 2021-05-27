@@ -1,6 +1,6 @@
-.idea
 config.py
-
+.idea
+migrations
 env.py
 # Byte-compiled / optimized / DLL files
 __pycache__/

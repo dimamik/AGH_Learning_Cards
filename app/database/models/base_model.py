@@ -16,7 +16,6 @@ class BaseModel(db.Model):
             to_ret.pop('_sa_instance_state')
         return to_ret.items()
 
-    # TODO Work on _to_dict form of representation!
     def __repr__(self):
         return str(self.json())
 

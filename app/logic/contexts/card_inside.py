@@ -2,10 +2,6 @@ from datetime import date
 
 
 class CardInside:
-    """
-    # TODO Add needed fields
-    """
-
     def __init__(self, foreground="WordToLearn", background="Definition"):
         super(CardInside, self).__init__()
         self.foreground = foreground

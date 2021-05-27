@@ -2,8 +2,10 @@ import logging
 import subprocess
 
 
-def migrate_and_upgrade():
+def init_database():
     logging.info("Performing update and migrate on database")
+
+    subprocess.call("python ./app/database/manage/manage.py db init", shell=True)
 
     subprocess.call("python ./app/database/manage/manage.py db migrate", shell=True)
 
@@ -11,4 +13,4 @@ def migrate_and_upgrade():
 
 
 if __name__ == '__main__':
-    migrate_and_upgrade()
+    init_database()

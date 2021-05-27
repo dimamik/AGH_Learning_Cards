@@ -15,17 +15,6 @@ router = Blueprint('router', __name__, url_prefix='/api')
 cors = CORS()
 
 
-@router.route('/auth/sign-up', methods=['POST'])
-@cross_origin(supports_credentials=True)
-def handle_sign_up():
-    try:
-        user_request = UserCreationRequest(flask.request.json)
-        user_response = auth_service.create_user(user_request)
-        return flask.jsonify(user_response.to_dict()), HTTP_CREATED
-    except HttpException as e:
-        return flask.jsonify(message=f'{e}'), e.status
-
-
 @router.route('/auth/sign-in', methods=['POST'])
 @cross_origin(supports_credentials=True)
 def handle_sign_in():
@@ -37,6 +26,17 @@ def handle_sign_in():
         return flask.jsonify(message=f'{e}'), e.status
 
 
+@router.route('/auth/sign-up', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def handle_sign_up():
+    try:
+        user_request = UserCreationRequest(flask.request.json)
+        user_response = auth_service.create_user(user_request)
+        return flask.jsonify(user_response.to_dict()), HTTP_CREATED
+    except HttpException as e:
+        return flask.jsonify(message=f'{e}'), e.status
+
+
 @router.route('/auth/sign-out', methods=['POST'])
 @cross_origin(supports_credentials=True)
 @login_required
@@ -44,16 +44,6 @@ def handle_sign_out():
     try:
         auth_service.logout_user()
         return '', HTTP_NO_CONTENT
-    except HttpException as e:
-        return flask.jsonify(message=f'{e}'), e.status
-
-
-@router.route('/test', methods=['GET'])
-@cross_origin(supports_credentials=True)
-@login_required
-def handle_test():
-    try:
-        return flask.jsonify(message='Test message protected by login_required'), HTTP_OK
     except HttpException as e:
         return flask.jsonify(message=f'{e}'), e.status
 
@@ -110,7 +100,7 @@ def add_new_collection():
     )
     collection.set_description(request.json['collectionDescription'])
     collection.set_name(request.json['collectionName'])
-    return flask.jsonify(new_collection_id), HTTP_OK
+    return flask.jsonify(new_collection_id), HTTP_CREATED
 
 
 @router.route('/current-user/collections', methods=['DELETE'])
@@ -122,7 +112,7 @@ def delete_collection():
         owner_of_collection = CardsCollectionContext.get_collection_by_id(collection_id)
         if owner_of_collection.holderID == current_user.instance.userID:
             CardsCollectionContext.delete_collection(collection_id)
-            return "", HTTP_OK
+            return "", HTTP_NO_CONTENT
     return flask.jsonify("Unauthorized"), HTTP_UNAUTHORIZED
 
 
@@ -143,7 +133,6 @@ def add_to_user_favorite(collection_id):
         CardsCollectionContext.add_to_user_favorite(user_id=user_id, collection_id=collection_id)
         return "", HTTP_OK
     except Exception as e:
-        # TODO Don't send server errors to client TO REFACTOR
         return flask.jsonify(message=f'{e}'), 500
 
 
@@ -156,7 +145,6 @@ def delete_from_user_favorite(collection_id):
         CardsCollectionContext.delete_from_user_favorite(user_id=user_id, collection_id=collection_id)
         return " ", HTTP_OK
     except Exception as e:
-        # TODO Don't send server errors to client TO REFACTOR
         return flask.jsonify(message=f'{e}'), 500
 
 
