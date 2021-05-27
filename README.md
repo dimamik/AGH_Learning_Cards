@@ -24,9 +24,9 @@
   <summary>Table of Contents</summary>
   <ol>
     <li><a href="#authors">Authors</a></li>
-    <li><a href="#project-idea">About the project</a></li>
+    <li><a href="#project-idea">About The Project</a></li>
     <li><a href="#project-presentation">Project Presentation</a></li>
-    <li><a href="#technology-stack">Technology stack</a></li>
+    <li><a href="#technology-stack">Technology Stack</a></li>
     <li><a href="#database-diagram">Database Diagram</a></li>
     <li><a href="#api-endpoints">API Endpoints</a></li>
     <li><a href="#getting-started">Getting Started</a></li>
