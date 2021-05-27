@@ -10,7 +10,7 @@ from app.logic.contexts.card_context import CardContext
 from app.logic.contexts.cards_collection_context import CardsCollectionContext
 from app.logic.services import auth_service
 
-router = Blueprint('router', __name__)
+router = Blueprint('router', __name__, url_prefix='/api')
 
 cors = CORS()
 
