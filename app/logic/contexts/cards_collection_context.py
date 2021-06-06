@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import Union
 
 from app import UserContext
@@ -61,12 +62,15 @@ class CardsCollectionContext(BaseContext):
         Session.del_and_commit(CardContext.get_card_by_id(single_card_id))
 
     @staticmethod
-    def get_user_collections_json(user_id: int):
-        to_ret_plain = Session.query(CardsCollection).filter(CardsCollection.holderID == user_id).all()
-        if to_ret_plain is not None:
-            for index, obj in enumerate(to_ret_plain):
-                to_ret_plain[index] = obj.json()
-        return to_ret_plain
+    def get_user_collections_json(user_id, page: int, size: int):
+        data = Session.query(CardsCollection) \
+            .filter(CardsCollection.holderID == user_id) \
+            .paginate(page=page, per_page=size, max_per_page=size)
+
+        res = {"total": data.pages, "items": []}
+        for obj in data.items:
+            res["items"].append(obj.json())
+        return res
 
     def get_only_watched_cards_of_collection(self, user_id):
         return Session.query(Card).join(CardWatched) \
@@ -87,28 +91,33 @@ class CardsCollectionContext(BaseContext):
         return user.collectionsLiked
 
     @staticmethod
-    def get_all_collections_json():
-        to_ret_plain = Session.query(CardsCollection).all()
-        for index, obj in enumerate(to_ret_plain):
-            to_ret_plain[index] = obj.json()
-            to_ret_plain[index] = obj.json()
-        return to_ret_plain
+    def get_all_collections_json(page: int, size: int):
+        data = Session.query(CardsCollection).paginate(page=page, per_page=size, max_per_page=size)
+
+        res = {"total": data.pages, "items": []}
+        for obj in data.items:
+            res["items"].append(obj.json())
+        return res
 
     @staticmethod
-    def get_all_collections_with_field_liked(user_id):
-        to_ret_plain = Session.query(CardsCollection).all()
+    def get_all_collections_with_field_liked(user_id, page: int, size: int):
+        data = Session.query(CardsCollection).paginate(page=page, per_page=size)
+
         list_of_liked = []
         liked = CardsCollectionContext.get_user_liked_collections(user_id)
         for collection in liked:
-            print(collection)
             list_of_liked.append(collection.collectionID)
-        for index, obj in enumerate(to_ret_plain):
-            to_ret_plain[index] = obj.json()
+
+        res = {"total": data.pages, "items": []}
+        for obj in data.items:
+            obj_json = obj.json()
             if obj.collectionID in list_of_liked:
-                to_ret_plain[index]['is_liked'] = True
+                obj_json["is_liked"] = True
             else:
-                to_ret_plain[index]['is_liked'] = False
-        return to_ret_plain
+                obj_json['is_liked'] = False
+
+            res["items"].append(obj_json)
+        return res
 
     @staticmethod
     def get_single_cards_string_list(collection_id):
@@ -152,13 +161,17 @@ class CardsCollectionContext(BaseContext):
         return to_ret
 
     @staticmethod
-    def get_user_favorites(user_id):
+    def get_user_favorites(user_id, page: int, size: int):
         user_instance = UserContext.get_user_instance_by_id(user_id).instance
         liked_list = user_instance.collectionsLiked
-        to_ret = []
-        for entry in liked_list:
-            to_ret.append(CardsCollectionContext.get_collection_by_id(entry.collectionID).json())
-        return to_ret
+
+        res = {"total": int(math.ceil(len(liked_list) / size)), "items": []}
+        for i in range((page - 1)*size, page*size):
+            try:
+                res["items"].append(CardsCollectionContext.get_collection_by_id(liked_list[i].collectionID).json())
+            except IndexError:
+                break
+        return res
 
     @staticmethod
     def add_to_user_favorite(user_id, collection_id):
