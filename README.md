@@ -9,6 +9,8 @@
     <br />
     <br />
     <br />
+    <a href="https://github.com/dimamik/learning-cards-front">Front</a>
+    ·    
     <a href="http://95.111.249.217">View Demo</a>
     ·
     <a href="https://github.com/dimamik/AGH_Learning_Cards/issues">Report Bug</a>
@@ -24,7 +26,7 @@
   <summary>Table of Contents</summary>
   <ol>
     <li><a href="#authors">Authors</a></li>
-    <li><a href="#project-idea">About The Project</a></li>
+    <li><a href="#about-the-project">About The Project</a></li>
     <li><a href="#project-presentation">Project Presentation</a></li>
     <li><a href="#technology-stack">Technology Stack</a></li>
     <li><a href="#database-diagram">Database Diagram</a></li>
@@ -115,6 +117,25 @@ POSTGRES = {
 }
 
 SECRET_KEY = "Generated in previous step secret key"
+```
+
+## Fill with data from csv:
+```python
+def fill_with_data(csv_path,collection_id,column_front,column_back):
+    import csv
+    with open("out.txt", "w") as file:
+        with open(csv_path,newline='') as csv_file:
+            list_of_rows = csv.reader(csv_file, delimiter=',', quotechar='|')
+            for row in list_of_rows:
+                row[column_front] = row[column_front].replace("\"","")  
+                row[column_back] = row[column_back].replace("\"","")           
+                print(row)
+                json_to_write = {
+                    'front' : row[column_front],
+                    'back' : row[column_back]
+                }
+                json_to_write = str(json_to_write).replace("'", "\"")
+                file.write(f"{collection_id}\t{json_to_write}\n")
 ```
 
 <!-- LICENSE -->
