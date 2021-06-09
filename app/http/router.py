@@ -62,17 +62,23 @@ def handle_current():
 @router.route('/collections', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def all_collections():
+    page = request.args.get('page', 1, type=int)
+    size = request.args.get('size', 30, type=int)
+
     if current_user.is_anonymous:
-        return flask.jsonify(CardsCollectionContext.get_all_collections_json()), HTTP_OK
+        return flask.jsonify(CardsCollectionContext.get_all_collections_json(page, size)), HTTP_OK
     else:
         return flask.jsonify(
-            CardsCollectionContext.get_all_collections_with_field_liked(current_user.instance.userID)), HTTP_OK
+            CardsCollectionContext.get_all_collections_with_field_liked(current_user.instance.userID, page, size)), HTTP_OK
 
 
 @router.route('/collections/user/<user_id>', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def all_collections_by_user(user_id):
-    to_ret = flask.jsonify(CardsCollectionContext.get_user_collections_json(user_id))
+    page = request.args.get('page', 1, type=int)
+    size = request.args.get('size', 30, type=int)
+
+    to_ret = flask.jsonify(CardsCollectionContext.get_user_collections_json(user_id, page, size))
     if to_ret is not None:
         return to_ret, HTTP_OK
 
@@ -119,8 +125,11 @@ def delete_collection():
 @router.route('/current-user/favorite', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def get_user_favorite():
+    page = request.args.get('page', 1, type=int)
+    size = request.args.get('size', 30, type=int)
+
     user_id = current_user.instance.userID
-    usr_fav = CardsCollectionContext.get_user_favorites(user_id)
+    usr_fav = CardsCollectionContext.get_user_favorites(user_id, page, size)
     return flask.jsonify(usr_fav)
 
 
