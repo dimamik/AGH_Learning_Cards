@@ -11,8 +11,6 @@
     <br />
     <a href="https://github.com/dimamik/learning-cards-front">Front</a>
     ·    
-    <a href="http://95.111.249.217">View Demo</a>
-    ·
     <a href="https://github.com/dimamik/AGH_Learning_Cards/issues">Report Bug</a>
     ·
     <a href="https://github.com/dimamik/AGH_Learning_Cards/issues">Request Feature</a>
